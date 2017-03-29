@@ -1,0 +1,77 @@
+$(document).on('helpoverlay.ready', function() //When the help overlay object is ready, begin building our help items.
+{
+  function getProp(property, type, pluginID)
+  {
+    if(typeof pluginID !== "string") { pluginID = '{{p.id}}'; }
+    if(typeof property !== "string") { console.error("Error in prop: property should be of type string. Type is " + typeof property); }
+    if(typeof type !== "string") { console.error("Error in prop: type should be of type string. Type is " + typeof type); }
+
+    var preStr = "ptplugin["+pluginID+"].settings[0].option[";  /* Concat with necessary var */  var endStr = '].value';
+    var val = getKrValue(preStr+property+endStr, type);
+    return val;
+  }
+
+  var p = '{{p.id}}';
+
+  var fc = ktools.Color.hex2rgb(getProp("text_font_colour", "string", p));
+  fc.push(getProp("text_font_alpha", "float", p));
+
+  var deco = [];
+  if(getProp("text_font_underline", "bool", p)) { deco.push('underline'); }
+  if(getProp("text_font_strikethrough", "bool", p)) { deco.push('strikethrough'); }
+
+  var bc = ktools.Color.hex2rgb(getProp("container_backgroundColour", "string", p));
+  bc.push(getProp("container_backgroundAlpha", "float", p));
+
+  var info = {
+    container: {
+      id: p,
+      position: getProp('container_position', 'string', p),
+      offset: {
+        x: getProp('container_offsetX', 'int', p),
+        y: getProp('container_offsetY', 'int', p),
+      },
+      padding: {
+        x: getProp('container_paddingX', 'int', p),
+        y: getProp('container_paddingY', 'int', p),
+      },
+      size: {
+        x: getProp('container_sizeX', 'int', p),
+        y: getProp('container_sizeY', 'int', p),
+      },
+      background: bc,
+    },
+    arrow: {
+      id: p,
+      position: getProp('arrow_position', 'string', p),
+      offset: {
+        x: getProp('arrow_offsetX', 'int', p),
+        y: getProp('arrow_offsetY', 'int', p),
+      },
+      size: {
+        x: getProp('arrow_sizeX', 'int', p),
+        y: getProp('arrow_sizeY', 'int', p),
+      },
+      direction: getProp('arrow_direction', 'string', p),
+      image: getProp('data_dir', 'string', p) + '/' + getProp('plugin_dir', 'string', p) + '/' + getProp('arrow_image', 'string', p),
+    },
+    text: {
+      id: p,
+      font: {
+        size:       getProp("text_font_size", "int", p)+"px",
+        family:     getProp("text_font_family", "string", p),
+        decoration: deco.length == 0 ? "normal" : deco.join(' '),
+        style:      getProp("text_font_italics", "bool", p) ? "italic" : "normal",
+        weight:     getProp("text_font_bold", "bool", p) ? "bold" : "normal",
+        color:      "rgba("+fc.join(',')+")",
+      },
+      content: getProp("text_content", "string", p),
+      offset: {
+        x: getProp('text_offsetX', 'int', p),
+        y: getProp('text_offsetY', 'int', p),
+      },
+    },
+  };
+
+  window.help.register(info); //Register our plugin.
+});

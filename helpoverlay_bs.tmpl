@@ -1,0 +1,455 @@
+/**
+* Name: Visited Hotspot Tracker
+* Author: Connor Deckers (cdeckers)
+* Date: 24 November 2016
+*/
+
+// Progress
+// TODO: Implement SVG arrow overlays
+// TODO: Add boxes
+// TODO: Add under-overlay (behind the help containers)
+// TODO: Run on start of tour
+// TODO: Test and progress
+
+var plugin_helpOverlay = (plugin_helpOverlay !== undefined ? plugin_helpOverlay : (function( $ , undefined ) {
+  function plugin(args) {
+    var pub = {}; //Public facing functions and variables.
+    var priv = {}; //Helper container to hold known-private variables.
+    priv.CSS = {};
+    var settings = {};
+    var defaults = {
+      id: '',   //Plugin ID
+      Arrow: '',      //Image to display next to the clickable element of the information element.
+      Resources: '',      //Resources URI
+      font: {   //Font defaults
+        size: '24px',
+        family: 'Calibri',
+        decoration: 'none',
+        style: 'normal',
+        weight: 'normal',
+        color: 'black',
+        shadow: '',
+        lineheight: '',
+      },
+      padding: {
+        top: '30px',
+        right: '30px',
+        bottom: '30px',
+        left: '30px',
+      },
+      position: 'topleft', //Onscreen position of the information element
+      visibility: true,   //Is the element visible?
+    }
+
+    //Add our defaults and overrides to our primary settings object.
+    settings = $.extend(true, {}, defaults, args);
+
+    //If the item has no id, then break the creation and close code.
+    if(settings.id == '')
+    {
+      console.error("Invalid ID set.");
+      return false;
+    }
+
+    /**
+     * Identifies the version of the plugin
+     * @type {Number}
+     */
+    pub.version = 0.01;
+
+
+   /******************************
+    *     PROTOTYPE FUNCTIONS    *
+    ******************************/
+
+    String.prototype.pairSwap = function() {
+      var orig = this;
+      for(var i = 0; i < arguments.length; i++)
+      {
+          if(orig.indexOf(arguments[i][0]) > -1) { orig = orig.replace(arguments[i][0], arguments[i][1]); }
+          else if(orig.indexOf(arguments[i][1]) > -1) { orig = orig.replace(arguments[i][1], arguments[i][0]); }
+      }
+      return orig;
+    };
+
+   /*******************************
+    *       PUBLIC FUNCTIONS      *
+    *******************************/
+
+    /**
+     * Allows the user to toggle the visibility of the text, for hooking into hide/show control events.
+     * If called without a state argument, it will return the items current visibility status.
+     * @author cdeckers
+     * @version 0.1
+     * @date    2016-12-22
+     * @param   {bool}   state The items visibility state (true; false;)
+     * @return  {bool}         Returns true if the item is successfully toggled.
+     */
+    pub.visible = function(state)
+    {
+      if(state === 'undefined') return settings.visibility;
+      if(priv.container === 'undefined') return null;
+      $(priv.container).css("display", state?"block":"none");
+      settings.visibility = state;
+      return true;
+    };
+
+    /*******************************
+     *        EVENT HANDLERS       *
+     *******************************/
+
+    //Fires when the tour begins initially.
+    $(document).on('pano_ontourstart', function() {
+      priv.drawContainer();
+      priv.drawElements();
+      priv.styles.build();
+    });
+
+
+    /*******************************
+     *      PRIVATE FUNCTIONS      *
+     *******************************/
+
+    //Draws container onto the screen, ready for content to be added
+    priv.drawContainer = function()
+    {
+      if($('#'+settings.id).length === 0)
+      {
+        var textElem = document.createElement('div');
+        textElem.id = settings.id;
+
+        //Add the container of the square to the container of the tour
+        $(settings.parent).prepend(textElem);
+
+        $(textElem).css({
+            'position': 'absolute',
+            'z-index': '5000',
+            'overflow': 'hidden',
+            'pointer-events': 'none',
+            'background': 'rgba(255,255,255,0.75)',
+            'cursor': 'default',
+            'width': '100%',
+            'height': '100%',
+          });
+
+        // priv.styles.build();
+      }
+      priv.container = $('#'+settings.id);
+      return $('#'+settings.id);
+    };
+
+    //Format and insert the content. Is called every time the information needs to be updated.
+    priv.drawElements = function()
+    {
+      var elements = [
+        {
+          position: 'topleft',
+          arrow: {
+            position: 'topleft',
+            angle: 'topleft',
+            width: 100,
+            height: 100,
+          },
+          id: 0,
+          width:'300',
+          height:'200',
+          help: {
+            text: 'help icon',
+            offset: {
+              x: 0,
+              y:0,
+            },
+          },
+        },
+        {
+          position: 'bottomleft',
+          arrow: {
+            position: 'bottomright',
+            angle: 'bottomright',
+            width: 100,
+            height: 100,
+          },
+          id:1,
+          width:'350',
+          height:'250',
+          help: {
+            text: 'help icon',
+            offset: {
+              x: 0,
+              y:0,
+            },
+          },
+        },
+        {
+          position: 'bottomright',
+          arrow: {
+            position: 'right',
+            angle: 'right',
+            width: 100,
+            height: 100,
+          },
+          id:2,
+          width:'300',
+          height:'150',
+          help: {
+            text: 'help icon',
+            offset: {
+              x: 10,
+              y:0,
+            },
+          },
+        },
+        {
+          position: 'topright',
+          arrow: {
+            position: 'top',
+            angle: 'top',
+            width: 100,
+            height: 100,
+          },
+          id:3,
+          width:'250',
+          height:'200',
+          help: {
+            text: 'help icon',
+            offset: {
+              x: 0,
+              y:0,
+            },
+          },
+        },
+      ];
+      var rotation = {
+        'topleft': -45,
+        'top': 0,
+        'topright': 45,
+        'left': -90,
+        'bottomleft': -135,
+        'bottom': 180,
+        'bottomright': 135,
+        'right': 90,
+      };
+
+      var hardSpacing = 10;
+
+      $.each(elements, function(k,v) {
+
+        if($("#helpDialog"+v.id).length === 0)
+        {
+          var smallestDimension = (v.width < v.height ? v.width : v.height);
+
+          var pos = { top: 'auto', left: 'auto', right: 'auto', bottom: 'auto', };
+          if(v.position.indexOf("top") > -1) { pos.top = 0;}
+          if(v.position.indexOf("left") > -1) { pos.left = 0; }
+          if(v.position.indexOf("bottom") > -1) { pos.bottom = 0; }
+          if(v.position.indexOf("right") > -1) { pos.right = 0; }
+
+          var arrowpos = { top: 'auto', left: 'auto', right: 'auto', bottom: 'auto', };
+          if(v.arrow.position.indexOf("top") > -1) { arrowpos.top = 0;}
+          if(v.arrow.position.indexOf("left") > -1) { arrowpos.left = 0; }
+          if(v.arrow.position.indexOf("bottom") > -1) { arrowpos.bottom = 0; }
+          if(v.arrow.position.indexOf("right") > -1) { arrowpos.right = 0; }
+
+          var arrowposCSS = {};
+
+          switch(v.arrow.position)
+          {
+            case 'top':
+            case 'bottom':
+              arrowpos.left = '0';
+              arrowpos.right = '0';
+              break;
+            case 'left':
+            case 'right':
+              arrowpos.top = '0';
+              arrowpos.bottom = '0';
+              break;
+          }
+
+          var helpDiv = document.createElement('div');
+          helpDiv.id = "helpDialog"+v.id;
+          helpDiv.className = 'help-container';
+
+          $(helpDiv).css({
+            'top':    pos.top,
+            'left':   pos.left,
+            'bottom': pos.bottom,
+            'right':  pos.right,
+            'position': 'absolute',
+            'width':  v.width + 'px',
+            'height': v.height + 'px',
+            'border': 'thin black solid',
+            'border-radius': '3px',
+            'margin': settings.padding.bottom + ' ' + settings.padding.left + ' ' + settings.padding.right + ' ' + settings.padding.top,
+          }).html('');
+
+          var margin = {};
+          var spacing = 0;
+          var soleDirections = ['top', 'left', 'bottom', 'right'];
+          if(soleDirections.indexOf(v.arrow.angle) > -1)
+          {
+            margin[v.arrow.angle] = hardSpacing + 'px';
+            spacing = hardSpacing;
+          }
+
+          var arrow = priv.drawArrow(v.id);
+          $(arrow).css({
+            position: 'absolute',
+            width:    v.arrow.width + 'px',
+            height:   v.arrow.height + 'px',
+            'top':    arrowpos.top,
+            'left':   arrowpos.left,
+            'bottom': arrowpos.bottom,
+            'right':  arrowpos.right,
+            'margin': 'auto',
+          });
+
+          priv.styles.add('#'+arrow.id+':before', {
+            'content': '""',
+            'position': 'absolute',
+            'width': '100%',
+            'height': '100%',
+            'z-index': '0',
+            'background': 'url("' + settings.Resources + settings.Arrow + '") center center no-repeat',
+            'background-size': 'contain',
+            '-webkit-transform': 'rotate('+rotation[v.arrow.angle]+'deg)',
+            '-moz-transform': 'rotate('+rotation[v.arrow.angle]+'deg)',
+            '-ms-transform': 'rotate('+rotation[v.arrow.angle]+'deg)',
+            '-o-transform': 'rotate('+rotation[v.arrow.angle]+'deg)',
+            'transform': 'rotate('+rotation[v.arrow.angle]+'deg)',
+          });
+
+          priv.styles.add('#'+arrow.id+':before', margin);
+
+          priv.styles.add('.help-container', {
+            'background-color': 'rgba(255,255,255,0.75)',
+          });
+
+        //TODO: Fix left pos and right pos causing text to wrap? Try doing something clever to make the text align center in
+
+          var help = priv.drawHelp(v.id, v.help.text);
+          $(help).css({
+            'position': 'absolute',
+            'top': (arrowpos.top == 'auto'? arrowpos.top : v.arrow.height + v.help.offset.y + (v.arrow.angle == 'top' ? hardSpacing : 0) + 'px'),
+            'left': (arrowpos.left == 'auto'? arrowpos.left : v.arrow.width + v.help.offset.x + (v.arrow.angle == 'left' ? hardSpacing : 0) + 'px'),
+            'bottom': (arrowpos.bottom == 'auto'? arrowpos.bottom : v.arrow.height + v.help.offset.y + (v.arrow.angle == 'bottom' ? hardSpacing : 0) + 'px'),
+            'right': (arrowpos.right == 'auto'? arrowpos.right : v.arrow.width + v.help.offset.x + (v.arrow.angle == 'right' ? hardSpacing : 0) + 'px'),
+            'margin': 'auto',
+          });
+
+          $(help).find('.help-text').css({
+            "font-family":      settings.font.family,
+            "font-weight":      settings.font.weight,
+            "font-style":       settings.font.style,
+            "text-decoration":  settings.font.decoration,
+            "font-size":        settings.font.size,
+            "color":            settings.font.color,
+            "line-height":      settings.font.lineheight,
+            "text-shadow":      settings.font.shadow,
+            "margin": '0',
+            "padding": '0',
+          });
+
+          if(v.arrow.angle == 'top' || v.arrow.angle == 'bottom')
+          {
+              $(help).css({
+                'left': '',
+                'right': '',
+                'width': '100%',
+                'text-align': 'center',
+              });
+          }
+
+          $(help).appendTo(helpDiv);
+          $(arrow).appendTo(helpDiv);
+
+          //Add the container of the square to the container of the tour
+          $(priv.container).prepend(helpDiv);
+
+          if(v.arrow.angle == 'left' || v.arrow.angle == 'right')
+          {
+              $(help).css({
+                'top': (v.height / 2) - ($(help).find('.help-text').height() / 2) + 'px',
+                'bottom': '',
+              });
+          }
+        }
+      });
+    };
+
+    priv.drawHelp = function(elementID, text)
+    {
+      var help = document.createElement('div'); help.id='help'+elementID; help.className='help-text-container';
+      $(help).html('<p class="help-text">'+text+'</p>');
+      return help;
+    }
+
+    //Draw me an arrow!
+    priv.drawArrow = function(elementID)
+    {
+      var svg = document.createElement('div');  svg.id='arrow'+elementID; svg.className = "arrow";
+      // $(svg).html('<div id="arrow'+elementID+'ctrl" class="arrowctrl"><img src="arrow.png" alt="arrow" class="arrow" /></div>')
+      return svg;
+    }
+
+    /* Style generator */
+    priv.styles = {
+      build: function() {
+        priv.styles.generate();
+      },
+      add: function(identifier, rule) {
+        if(priv.CSS[identifier] == null) { priv.CSS[identifier] = {}; }
+        $.extend(priv.CSS[identifier], rule);
+      },
+      generate: function() {
+        var rules = "";
+        $.each(priv.CSS, function(id, props)
+        {
+          rules += id + " {\n";
+          $.each(props, function(property, rule) {
+            rules += "\t"+property+":"+rule+";\n";
+          });
+          rules += "}\n\n";
+        });
+        if($('style#helpoverlay').length == 0) { $("head").append("<style id='helpoverlay'></style>"); }
+        $("style#helpoverlay").append(rules);
+      }
+    };
+    return pub;
+  }
+
+  var items = {};
+  function manager() {
+    var pub = {};
+
+    pub.register = function(id, props)
+    {
+      if(items.hasOwnProperty(id)) { console.error("Can't reregister item."); return items[id]; }
+      else {
+        if(props == undefined) { props = {}; }
+        if(!props.hasOwnProperty('id')) { props = $.extend(true, props, {'id':id}); }
+        var p = new plugin(props);
+        items[id] = p; return p;
+      }
+    }
+
+    pub.get = function(id)
+    {
+      if(items.hasOwnProperty(id)) { return items[id]; }
+      else { console.error("Item with ID `" + id + "` doesn't exist. Register your item before you use .get()"); return false; }
+    }
+
+    pub.delete = function(id)
+    {
+      if(items.hasOwnProperty(id)) { delete items[id]; return items.hasOwnProperty(id); }
+    }
+
+    pub.dump = function()
+    {
+      console.log(items);
+    }
+
+    return pub;
+  }
+  return manager;
+}(jQuery)));

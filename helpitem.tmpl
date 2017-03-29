@@ -1,0 +1,39 @@
+<ptplugin name="{{p.id}}" engine="helpOverlayItem">
+	<settings>
+		<option name="data_dir" value="{{dataDirectory}}" type="string" />
+		<option name="plugin_dir" value="{{pluginDirectory}}" type="string" />
+
+		<!-- Container settings -->
+		<option name="container_position" value="{{p.boxPosition.positionString}}" type="string" />
+		<option name="container_offsetX" value="{{p.boxPosition.x}}" type="int" />
+		<option name="container_offsetY" value="{{p.boxPosition.y}}" type="int" />
+		<option name="container_sizeX" value="{{p.boxSizeX.value}}" type="int" />
+		<option name="container_sizeY" value="{{p.boxSizeY.value}}" type="int" />
+		<option name="container_backgroundColour" value="{{p.background.colorRRGGBB}}" type="string" />
+		<option name="container_backgroundAlpha" value="{{p.background.alpha}}" type="float" />
+		<option name="container_paddingX" value="{{p.boxPaddingX.value}}" type="int" />
+		<option name="container_paddingY" value="{{p.boxPaddingY.value}}" type="int" />
+
+		<!-- Arrow settings -->
+		<option name="arrow_position" value="{{p.arrowLocation.positionString}}" type="string" />
+		<option name="arrow_offsetX" value="{{p.arrowLocation.x}}" type="int" />
+		<option name="arrow_offsetY" value="{{p.arrowLocation.y}}" type="int" />
+		<option name="arrow_direction" value="{{p.arrowDirection.positionString}}" type="string" />
+		<option name="arrow_sizeX" value="{{p.arrowSizeX.value}}" type="int" />
+		<option name="arrow_sizeY" value="{{p.arrowSizeY.value}}" type="int" />
+		<option name="arrow_image" value="arrow.png" type="string" />
+
+		<!-- Text settings -->
+		<option name="text_content" value="{{p.help.value}}" type="string" />
+		<option name="text_font_family" value="{{ p.font.family }}" type="string" />
+		<option name="text_font_bold" value="{{ p.font.bold }}" type="bool" />
+		<option name="text_font_italics" value="{{ p.font.italic }}" type="bool" />
+		<option name="text_font_underline" value="{{ p.font.underline }}" type="bool" />
+		<option name="text_font_strikethrough" value="{{ p.font.strikethrough }}" type="bool" />
+		<option name="text_font_size" value="{{p.font.size}}" type="int" />
+		<option name="text_font_colour" value="{{p.fontcolor.colorRRGGBB}}" type="string" />
+		<option name="text_font_alpha" value="{{p.fontcolor.alpha}}" type="float" />
+		<option name="text_offsetX" value="{{p.textOffsetX.value}}" type="int" />
+		<option name="text_offsetY" value="{{p.textOffsetY.value}}" type="int" />
+	</settings>
+</ptplugin>

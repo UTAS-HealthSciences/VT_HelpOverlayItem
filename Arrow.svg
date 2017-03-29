@@ -1,0 +1,15 @@
+<svg id="Arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44.03 114.67">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-miterlimit: 10;
+        stroke-width: 10px;
+      }
+    </style>
+  </defs>
+  <title>Arrow</title>
+  <polygon id="Arrowhead" points="22.02 0 44.03 38.13 0 38.13 22.02 0"/>
+  <line id="Line" class="cls-1" x1="22.02" y1="36.83" x2="22.02" y2="114.67"/>
+</svg>

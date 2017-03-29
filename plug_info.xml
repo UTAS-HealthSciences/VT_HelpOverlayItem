@@ -1,0 +1,85 @@
+<plugin id="HelpOverlayItem"
+        category="tr:Help"
+        name="tr:Help Item"
+        version="1.0"
+        isGraphical="true"
+        multipleInstance="true"
+        description="tr:Adds a help information item to the parent plugin (must include Help Overlay)."
+        author="Connor Deckers (cdeckers) 2017">
+
+        <parameters>
+          <group id="g_boxSettings" name="tr: Container">
+            <row id="r_boxPos">
+              <position id="boxPosition"
+                        name="tr:Position"
+                        availableValues="topleft,topright,bottomleft,bottomright,bottom,top,left,right,center"
+                        default="topleft"
+                        x="0" y="0"/>
+            </row>
+            <row id="r_boxSize">
+              <label id="boxSizeLabel" name="tr: Container Size:"/>
+              <label id="lab_boxSizeX" name="tr: Width: " />
+              <number id="boxSizeX" minimum="0" maximum="99999" default="250" suffix="px" />
+              <label id="lab_boxSizeY" name="tr: Height: " />
+              <number id="boxSizeY" minimum="0" maximum="99999" default="250" suffix="px" />
+            </row>
+            <row id="r_boxPadding">
+              <label id="boxPaddingLabel" name="tr: Container Padding:"/>
+              <label id="lab_boxPaddingX" name="tr: Horizontal: " />
+              <number id="boxPaddingX" minimum="0" maximum="1000" default="10" suffix="px" />
+              <label id="lab_boxPaddingY" name="tr: Vertical: " />
+              <number id="boxPaddingY" minimum="0" maximum="1000" default="10" suffix="px" />
+            </row>
+            <row id="r_boxBackground">
+              <color id="background" name="tr: Background color" default="#FFF" needAlpha="true" defaultAlpha="0.75" />
+            </row>
+          </group>
+          <group id="g_arrowSettings" name="tr: Arrow">
+            <row id="r_arrowLocation">
+              <label id="lab_arrowLocation" name="tr: Location" />
+              <position id="arrowLocation"
+                        name="tr:Location"
+                        availableValues="topleft,topright,bottomleft,bottomright,bottom,top,left,right"
+                        default="topleft"
+                        x="0" y="0"/>
+              <label id="lab_arrowDirection" name="tr: Direction" />
+              <position id="arrowDirection"
+                        name="tr:Direction"
+                        availableValues="topleft,topright,bottomleft,bottomright,bottom,top,left,right"
+                        default="topleft"
+                        x="0" y="0"/>
+            </row>
+            <row id="r_arrowSize">
+              <label id="arrowSizeLabel" name="tr: Arrow Size:"/>
+              <number id="arrowSizeX" minimum="0" maximum="1000" default="50" suffix="px wide" />
+              <number id="arrowSizeY" minimum="0" maximum="1000" default="50" suffix="px high" />
+            </row>
+          </group>
+          <group id="g_textSettings" name="tr: Information">
+            <row id="r_textInput">
+              <string id="help" name="tr: Help text" />
+            </row>
+            <row id="r_fontSettings">
+              <font id="font" name="tr: Font" default="Calibri" size="20" style="normal" />
+            </row>
+            <row id="r_color">
+              <color id="fontcolor" name="tr: Font Colour" default="#000" needalpha="true" defaultalpha="1.0" />
+            </row>
+            <row id="r_offset">
+              <label id="labOffset" name="tr: Text offset: " />
+              <number id="textOffsetX" name="tr: Horizontal: " default="5" minimum="-1000" maximum="1000" suffix="px" />
+              <number id="textOffsetY" name="tr: Vertical: " default="5" minimum="-1000" maximum="1000" suffix="px" />
+            </row>
+          </group>
+        </parameters>
+
+        <templates>
+            <template url="helpitem.tmpl" />
+            <template url="helpitem_loaded.tmpl" type="jsbootstraploaded" />
+        </templates>
+
+        <resources>
+          <file url="arrow.png" />
+        </resources>
+
+</plugin>
